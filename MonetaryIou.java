@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 public class MonetaryIou extends Iou {
     private BigDecimal monetaryValue;
 
-    public MonetaryIou(String title, String description, BigDecimal monetaryValue) {
-        super(title, description);
+    public MonetaryIou(String title, String notes, BigDecimal monetaryValue) {
+        super(title, notes);
         this.monetaryValue = monetaryValue;
     }
 
-    public MonetaryIou(String title, String description, BigDecimal monetaryValue, DateTime timestamp) {
-        super(title, description, timestamp);
+    public MonetaryIou(String title, String notes, BigDecimal monetaryValue, DateTime timestamp) {
+        super(title, notes, timestamp);
         this.monetaryValue = monetaryValue;
     }
 
