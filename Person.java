@@ -15,15 +15,25 @@ public class Person implements Comparable<Person> {
         this.ious = new LinkedList<Iou>();
     }
 
+    /**
+     * @return The IOUs to/from this Person. No assumptions can be made about the List's ordering.
+     */
     public List<Iou> getIous() {
         return ious;
     }
 
+    /**
+     * @return The IOUs to/from this Person sorted in reverse chronological order.
+     */
     public List<Iou> getIousSorted() {
         Collections.sort(ious);
         return ious;
     }
 
+    /**
+     * Calculates the total amount of money owed to or by this Person.
+     * @return A BigDecimal that's the sum of all this Person's IOUs. This may be negative.
+     */
     public BigDecimal getTotalOwedAmount() {
         BigDecimal sum = new BigDecimal(0.0);
 
