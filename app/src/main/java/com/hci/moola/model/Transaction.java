@@ -14,16 +14,23 @@ public class Transaction implements Parcelable, Comparable<Transaction> {
     private double amount;
     private String description;
     private Calendar date;
+    private int id;
 
+    public static int idCounter = 0;
     public static final int ERROR_NO_PERSON = -1;
     public static final int ERROR_NO_DESCRIPTION = -2;
 
     public Transaction(String person, boolean owesMe, double amount, String description, Calendar date) {
+        this(person, owesMe, amount, description, date, idCounter++);
+    }
+
+    public Transaction(String person, boolean owesMe, double amount, String description, Calendar date, int id) {
         this.person = person;
         this.owesMe = owesMe;
         this.amount = amount;
         this.description = description;
         this.date = date;
+        this.id = id;
     }
 
     public int isValid() {
@@ -32,6 +39,10 @@ public class Transaction implements Parcelable, Comparable<Transaction> {
         if (amount == 0 && (description == null || description.isEmpty()))
             return ERROR_NO_DESCRIPTION;
         return 0;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public double getFormattedAmount() {
@@ -73,8 +84,15 @@ public class Transaction implements Parcelable, Comparable<Transaction> {
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Transaction))
+            return false;
+        return this.id == ((Transaction) other).id;
+    }
+
+    @Override
     public int compareTo(Transaction another) {
-        return another.date.compareTo(date);
+        return id - another.id;
     }
 
     public Transaction(Parcel in){

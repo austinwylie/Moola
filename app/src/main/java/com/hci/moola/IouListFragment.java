@@ -51,6 +51,16 @@ public class IouListFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    public void updateTransaction(Transaction txn) {
+        for (Iou iou : mIous) {
+            if (txn.belongsToIou(iou)) {
+                iou.updateTransaction(txn);
+                break;
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
     public interface IouListFragmentCallback {
         public void onTransactionClicked(Iou iou, Transaction txn);
     }
@@ -80,7 +90,7 @@ public class IouListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_iou_list, container, false);
 
         mIouListView = (NaturalListView) rootView.findViewById(R.id.iouListView);
-        mAdapter = new IouAdapter(this.getActivity(), mIous, mIouListView);
+        mAdapter = new IouAdapter(this.getActivity(), mIous, mIouListView, mCallback);
         mIouListView.setAdapter(mAdapter);
         mIouListView.setNaturalListViewListener(mAdapter);
 
@@ -91,12 +101,14 @@ public class IouListFragment extends Fragment {
         private Locale mLocale;
         private LayoutInflater mInflater;
         private NaturalListView mListView;
+        private IouListFragmentCallback mFragmentCallback;
 
-        public IouAdapter(Activity activity, ObservableSortedList<Iou> items, NaturalListView listView) {
+        public IouAdapter(Activity activity, ObservableSortedList<Iou> items, NaturalListView listView, IouListFragmentCallback callback) {
             super(activity, items);
             mInflater = activity.getLayoutInflater();
             mLocale = activity.getResources().getConfiguration().locale;
             mListView = listView;
+            mFragmentCallback = callback;
         }
 
         public void collapseAllItems() {
@@ -143,7 +155,6 @@ public class IouListFragment extends Fragment {
             final ExpandableListItem<Iou> expandedItem = (ExpandableListItem<Iou>) getItem(position);
             final Iou item = expandedItem.getItem();
             if (item != null) {
-                int expandedHeight = 0;
                 holder.person.setText(item.getPerson());
                 holder.amount.setText(item.getTotalAmountText());
 
@@ -156,8 +167,6 @@ public class IouListFragment extends Fragment {
                         holder.expandableLayout.addView(tRow);
                     } else
                         tRow = holder.expandableLayout.getChildAt(i);
-
-                    expandedHeight += tRow.getMeasuredHeight();
 
                     final Transaction t = txns.get(i);
                     tRow.setOnTouchListener(new SwipeDismissTouchListener(tRow, null, new SwipeDismissTouchListener.DismissCallbacks() {
@@ -178,7 +187,7 @@ public class IouListFragment extends Fragment {
 
                         @Override
                         public void onClick(View view, Object token, float x, float y) {
-
+                            mFragmentCallback.onTransactionClicked(item, t);
                         }
                     }));
 

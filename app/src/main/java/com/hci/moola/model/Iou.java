@@ -17,6 +17,16 @@ public class Iou implements Parcelable, Comparable<Iou> {
         transactionList.add(trans);
     }
 
+    public void updateTransaction(Transaction txn) {
+        for (int i = 0; i < transactionList.size(); i++) {
+            Transaction t = transactionList.get(i);
+            if (txn.equals(t)) {
+                transactionList.set(i, txn);
+                break;
+            }
+        }
+    }
+
     public String getPerson() {
         return transactionList.get(0).getPerson();
     }

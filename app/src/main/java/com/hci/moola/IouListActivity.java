@@ -60,16 +60,25 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
             return;
 
         switch(requestCode) {
-            case REQUEST_ADD_TRANSACTION:
+            case REQUEST_ADD_TRANSACTION: {
                 Transaction createdTransaction = (Transaction) PostOffice.getMessage(this.getClass());
                 IouListFragment f = (IouListFragment) getFragmentManager().findFragmentByTag(TAG_IOU_LIST);
                 f.addTransaction(createdTransaction);
                 break;
+            }
+            case REQUEST_EDIT_TRANSACTION: {
+                Transaction editedTransaction = (Transaction) PostOffice.getMessage(this.getClass());
+                IouListFragment f = (IouListFragment) getFragmentManager().findFragmentByTag(TAG_IOU_LIST);
+                f.updateTransaction(editedTransaction);
+                break;
+            }
         }
     }
 
     @Override
     public void onTransactionClicked(Iou iou, Transaction txn) {
-
+        PostOffice.putMessage(EditIouActivity.class, txn);
+        Intent intent = new Intent(this, EditIouActivity.class);
+        startActivityForResult(intent, REQUEST_EDIT_TRANSACTION);
     }
 }

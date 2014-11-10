@@ -74,9 +74,6 @@ public class EditIouActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class EditIouFragment extends Fragment {
         private Transaction mModel;
         private EditText mPersonEditText;
@@ -107,7 +104,10 @@ public class EditIouActivity extends Activity {
             boolean owesMe = mOwesMeSwitch.isChecked();
             double amount = parseAmountText(mAmountEditText.getText().toString());
             String description = mDescriptionEditText.getText().toString();
-            return new Transaction(person, owesMe, amount, description, Calendar.getInstance());
+            if (mModel == null)
+                return new Transaction(person, owesMe, amount, description, Calendar.getInstance());
+            else
+                return new Transaction(person, owesMe, amount, description, Calendar.getInstance(), mModel.getId());
         }
 
         @Override
@@ -116,8 +116,10 @@ public class EditIouActivity extends Activity {
             View rootView = inflater.inflate(R.layout.fragment_edit_iou, container, false);
 
             mPersonEditText = (EditText) rootView.findViewById(R.id.edit_title_edittext);
-            if (mModel != null && mModel.getPerson() != null && !mModel.getPerson().isEmpty())
+            if (mModel != null && mModel.getPerson() != null && !mModel.getPerson().isEmpty()) {
                 mPersonEditText.setText(mModel.getPerson());
+                mPersonEditText.setEnabled(false);
+            }
 
             mOwesMeSwitch = (Switch) rootView.findViewById(R.id.edit_owe_switch);
             if (mModel != null)
