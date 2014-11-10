@@ -2,20 +2,26 @@ import org.joda.time.DateTime;
 import java.math.BigDecimal;
 
 public abstract class Iou implements Comparable<Iou> {
-    protected static final boolean REVERSE_SORT = false;
-    protected String title;
-    protected String notes;
-    protected DateTime timestamp;
+    private static final boolean REVERSE_SORT = false;
+    private String title;
+    private String notes;
+    private DateTime timestamp;
 
-    protected Iou(String title, String notes) {
+    /**
+     * Initializes a NonMonetaryIOU with the specified values and a current timestamp.
+     */
+    public Iou(String title, BigDecimal monetaryValue) {
         this.title = title;
-        this.notes = notes;
+        this.monetaryValue = monetaryValue;
         this.timestamp = new DateTime();
     }
 
-    protected Iou(String title, String notes, DateTime timestamp) {
+    /**
+     * Initializes a NonMonetaryIOU with the specified values.
+     */
+    public Iou(String title, BigDecimal monetaryValue, DateTime timestamp) {
         this.title = title;
-        this.notes = notes;
+        this.monetaryValue = monetaryValue
         this.timestamp = timestamp;
     }
 
@@ -25,20 +31,8 @@ public abstract class Iou implements Comparable<Iou> {
         return direction * this.timestamp.compareTo(iou.getTimestamp());
     }
 
-    public boolean isMonetary() {
-        if (this.getClass().equals(MonetaryIou.class)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public String getNotes() {
-        return notes;
     }
 
     public DateTime getTimestamp() {
@@ -49,13 +43,15 @@ public abstract class Iou implements Comparable<Iou> {
         this.title = title;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
     public void setTimestamp(DateTime timestamp) {
         this.timestamp = timestamp;
     }
 
-    public abstract BigDecimal getMonetaryValue();
+    public BigDecimal getMonetaryValue() {
+        return monetaryValue;
+    }
+
+    public BigDecimal setMonetaryValue(BigDecimal monetaryValue) {
+        this.monetaryValue = monetaryValue;
+    }
 }
