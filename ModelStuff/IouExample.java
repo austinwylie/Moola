@@ -10,6 +10,7 @@ public class Main {
         Person austin = new Person("Austin Wylie");
         Person august = new Person("August Smith");
         Person robert = new Person("Robert Wylie");
+        Person esha = new Person("Esha Joshi");
 
         austin.addIou(new MonetaryIou(
                 "Lunch",
