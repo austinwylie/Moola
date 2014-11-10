@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/byoung2/dev/Moola/app/build/intermediates/pre-dexed/debug/classes-f91cefec35cffac22c9690725f117cc6500acc2b.jar"
+        jar="/Users/byoung2/dev/Moola/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core-slh/3.1.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="49223278ec2ede1d05d00868c5ce3e077b4016f8"/>
+    <item
+        dex="/Users/byoung2/dev/Moola/app/build/intermediates/pre-dexed/debug/classes-4f780685f071c3c31140cf880d08b45879223c84.jar"
+        jar="/Users/byoung2/dev/Moola/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-manipulation/3.1.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="5660e4bf78904137e90e62a5d4cc2e987258f02c"/>
+    <item
+        dex="/Users/byoung2/dev/Moola/app/build/intermediates/pre-dexed/debug/classes-4c8682eafaf502049d27da6dc90799fda6acc465.jar"
+        jar="/Users/byoung2/dev/Moola/app/build/intermediates/exploded-aar/com.nhaarman.listviewanimations/lib-core/3.1.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="acf66033b1418ccf9e15c8e77750981e4809c4ea"/>
+
+</pre-dex-items>
