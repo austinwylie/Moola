@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/itemrow_gripview"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="72dp" >
 
-    <TextView
-        android:id="@+id/iouPerson"
-        style="@style/iouListItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp" />
-    <TextView
-        android:id="@+id/iouAmount"
-        style="@style/iouListItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/list_item_iou_person"
+            style="@style/iouListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp" />
+        <TextView
+            android:id="@+id/list_item_iou_amount"
+            style="@style/iouListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

@@ -6,20 +6,31 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.hci.moola.model.Iou;
 import com.hci.moola.model.PostOffice;
 import com.hci.moola.model.Transaction;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class IouListActivity extends Activity {
+    private ArrayList<Iou> mIous;
+
     private static final int REQUEST_ADD_TRANSACTION = 1;
+    private static final String TAG_IOU_LIST = "IouListFragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_iou_list);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new IouListFragment())
-                    .commit();
+            mIous = new ArrayList<Iou>();
+            mIous.add(new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance())));
+            mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance())));
+            mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance())));
+
+            IouListFragment f = IouListFragment.newInstance(mIous);
+            getFragmentManager().beginTransaction().add(R.id.container, f, TAG_IOU_LIST).commit();
         }
     }
 
@@ -48,6 +59,8 @@ public class IouListActivity extends Activity {
         switch(requestCode) {
             case REQUEST_ADD_TRANSACTION:
                 Transaction createdTransaction = (Transaction) PostOffice.getMessage(this.getClass());
+                IouListFragment f = (IouListFragment) getFragmentManager().findFragmentByTag(TAG_IOU_LIST);
+                f.addTransaction(createdTransaction);
                 break;
         }
     }

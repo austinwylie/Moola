@@ -18,6 +18,7 @@ import com.hci.moola.model.Transaction;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 
 
 public class EditIouActivity extends Activity {
@@ -26,7 +27,6 @@ public class EditIouActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_iou);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle("Add Iou");
 
         if (savedInstanceState == null) {
@@ -55,6 +55,10 @@ public class EditIouActivity extends Activity {
             setResult(Activity.RESULT_OK);
             finish();
             return true;
+        } else if (id == android.R.id.home) {
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -79,7 +83,7 @@ public class EditIouActivity extends Activity {
             boolean owesMe = mOwesMeSwitch.isChecked();
             double amount = parseAmountText(mAmountEditText.getText().toString());
             String description = mDescriptionEditText.getText().toString();
-            return new Transaction(person, owesMe, amount, description);
+            return new Transaction(person, owesMe, amount, description, Calendar.getInstance());
         }
 
         @Override
