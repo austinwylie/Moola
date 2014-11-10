@@ -12,10 +12,7 @@ import com.hci.moola.model.Iou;
 import com.hci.moola.model.Transaction;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 
-
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class IouListFragment extends Fragment implements AdapterView.OnItemClickListener {
 
