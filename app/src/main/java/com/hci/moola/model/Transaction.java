@@ -8,7 +8,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class Transaction implements Parcelable {
+public class Transaction implements Parcelable, Comparable<Transaction> {
     private String person;
     private boolean owesMe;
     private double amount;
@@ -70,6 +70,11 @@ public class Transaction implements Parcelable {
 
     public boolean belongsToIou(Iou iou) {
         return this.person.equals(iou.getPerson());
+    }
+
+    @Override
+    public int compareTo(Transaction another) {
+        return another.date.compareTo(date);
     }
 
     public Transaction(Parcel in){

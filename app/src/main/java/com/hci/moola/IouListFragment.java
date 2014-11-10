@@ -1,29 +1,33 @@
 package com.hci.moola;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hci.moola.model.Iou;
+import com.hci.moola.model.ObservableSortedList;
 import com.hci.moola.model.Transaction;
-import com.hci.moola.view.ExpandableLayout;
-import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.hci.moola.view.ExpandableListItem;
+import com.hci.moola.view.ExpandableMultiSelectAdapter;
+import com.hci.moola.view.NaturalListView;
+import com.hci.moola.view.SwipeDismissTouchListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 public class IouListFragment extends Fragment {
-    private List<Iou> mIous;
+    private ObservableSortedList<Iou> mIous;
     private IouAdapter mAdapter;
-    private DynamicListView iouListView;
+    private NaturalListView mIouListView;
+    private IouListFragmentCallback mCallback;
 
     private static final String TAG_ARGS = "model";
 
@@ -36,8 +40,6 @@ public class IouListFragment extends Fragment {
     }
 
     public void addTransaction(Transaction txn) {
-        mAdapter.collapseExpanded();
-
         for (Iou iou : mIous) {
             if (txn.belongsToIou(iou)) {
                 iou.addTransaction(txn);
@@ -49,12 +51,25 @@ public class IouListFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    public interface IouListFragmentCallback {
+        public void onTransactionClicked(Iou iou, Transaction txn);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallback = (IouListFragmentCallback) activity;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            mIous = getArguments().getParcelableArrayList(TAG_ARGS);
+            ArrayList<Iou> items = getArguments().getParcelableArrayList(TAG_ARGS);
+            mIous = new ObservableSortedList<Iou>();
+            for (Iou i : items)
+                mIous.add(i);
         }
     }
 
@@ -64,66 +79,31 @@ public class IouListFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_iou_list, container, false);
 
-        iouListView = (DynamicListView) rootView.findViewById(R.id.iouListView);
-        mAdapter = new IouAdapter(this.getActivity(), mIous);
-        iouListView.setAdapter(mAdapter);
-        iouListView.enableSwipeToDismiss(
-                new OnDismissCallback() {
-                    @Override
-                    public void onDismiss(final ViewGroup listView, final int[] reverseSortedPositions) {
-                        for (int position : reverseSortedPositions) {
-                            mIous.remove(position);
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-        );
+        mIouListView = (NaturalListView) rootView.findViewById(R.id.iouListView);
+        mAdapter = new IouAdapter(this.getActivity(), mIous, mIouListView);
+        mIouListView.setAdapter(mAdapter);
+        mIouListView.setNaturalListViewListener(mAdapter);
 
         return rootView;
     }
 
-    private static class IouAdapter extends BaseAdapter {
-        private List<Iou> mItems;
+    private static class IouAdapter extends ExpandableMultiSelectAdapter<Iou> implements NaturalListView.NaturalListViewListener {
         private Locale mLocale;
         private LayoutInflater mInflater;
-        private boolean[] mExpanded;
+        private NaturalListView mListView;
 
-        public IouAdapter(Activity activity, List<Iou> items) {
-            mItems = items;
+        public IouAdapter(Activity activity, ObservableSortedList<Iou> items, NaturalListView listView) {
+            super(activity, items);
             mInflater = activity.getLayoutInflater();
             mLocale = activity.getResources().getConfiguration().locale;
-            mExpanded = new boolean[items.size()];
+            mListView = listView;
         }
 
-        public void collapseExpanded() {
-            Arrays.fill(mExpanded, false);
-        }
-
-        private boolean isExpanded(int index) {
-            return mExpanded[index];
-        }
-
-        @Override
-        public void notifyDataSetChanged() {
-            if (mExpanded.length < mItems.size()) {
-                mExpanded = new boolean[mItems.size() + 4];
+        public void collapseAllItems() {
+            for (ExpandableListItem<Iou> item : mItems) {
+                item.setExpanded(false);
             }
-            super.notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return mItems.size();
-        }
-
-        @Override
-        public Object getItem(int pos) {
-            return mItems.get(pos);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -136,26 +116,34 @@ public class IouListFragment extends Fragment {
                 holder = new TitleViewHolder();
                 holder.person = (TextView) convertView.findViewById(R.id.list_item_iou_person);
                 holder.amount = (TextView) convertView.findViewById(R.id.list_item_iou_amount);
-                holder.expandableLayout = (ExpandableLayout) convertView.findViewById(R.id.list_item_iou_expandablelayout);
+                holder.expandableLayout = (LinearLayout) convertView.findViewById(R.id.list_item_iou_expandablelayout);
                 holder.summaryLayout = (ViewGroup) convertView.findViewById(R.id.list_item_iou_summary_layout);
                 convertView.setTag(holder);
             } else
                 holder = (TitleViewHolder) convertView.getTag();
 
-            holder.summaryLayout.setOnClickListener(new View.OnClickListener() {
+            convertView.setOnTouchListener(new SwipeDismissTouchListener(convertView, null, new SwipeDismissTouchListener.DismissCallbacks() {
                 @Override
-                public void onClick(View v) {
-                    if (isExpanded(position)) {
-                        holder.expandableLayout.collapse();
-                    } else {
-                        holder.expandableLayout.expand();
-                    }
-                    mExpanded[position] = !mExpanded[position];
+                public boolean canDismiss(Object token, float x, float y) {
+                    return y >= holder.summaryLayout.getTop() && y <= holder.summaryLayout.getBottom();
                 }
-            });
 
-            Iou item = (Iou) getItem(position);
+                @Override
+                public void onDismiss(View view, Object token) {
+                    IouAdapter.this.mItems.remove(position);
+                    IouAdapter.this.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onClick(View view, Object token, float x, float y) {
+                    mListView.onItemClick(view, position);
+                }
+            }));
+
+            final ExpandableListItem<Iou> expandedItem = (ExpandableListItem<Iou>) getItem(position);
+            final Iou item = expandedItem.getItem();
             if (item != null) {
+                int expandedHeight = 0;
                 holder.person.setText(item.getPerson());
                 holder.amount.setText(item.getTotalAmountText());
 
@@ -169,9 +157,33 @@ public class IouListFragment extends Fragment {
                     } else
                         tRow = holder.expandableLayout.getChildAt(i);
 
+                    expandedHeight += tRow.getMeasuredHeight();
+
+                    final Transaction t = txns.get(i);
+                    tRow.setOnTouchListener(new SwipeDismissTouchListener(tRow, null, new SwipeDismissTouchListener.DismissCallbacks() {
+                        @Override
+                        public boolean canDismiss(Object token, float x, float y) {
+                            return true;
+                        }
+
+                        @Override
+                        public void onDismiss(View view, Object token) {
+                            item.removeTransaction(t);
+                            if (item.getTransactionList().isEmpty()) {
+                                IouAdapter.this.mItems.remove(position);
+//                                IouAdapter.this.collapseAllItems();
+                            }
+                            IouAdapter.this.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onClick(View view, Object token, float x, float y) {
+
+                        }
+                    }));
+
                     TextView description = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_description);
                     TextView date = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_date);
-                    Transaction t = txns.get(i);
                     description.setText(t.getFormattedDescription());
                     date.setText(t.getDate(mLocale));
                 }
@@ -179,17 +191,51 @@ public class IouListFragment extends Fragment {
                 while (holder.expandableLayout.getChildCount() > txns.size())
                     holder.expandableLayout.removeViewAt(holder.expandableLayout.getChildCount() - 1);
 
-                holder.expandableLayout.setVisibility(isExpanded(position) ? View.VISIBLE : View.GONE);
+                if (!expandedItem.isExpanded())
+                    holder.expandableLayout.setVisibility(View.GONE);
             }
 
             return convertView;
+        }
+
+        @Override
+        public boolean onExpandStart(View v, ExpandableListItem viewObject) {
+            TitleViewHolder holder = (TitleViewHolder) v.getTag();
+            holder.expandableLayout.setVisibility(View.VISIBLE);
+            return true;
+        }
+
+        @Override
+        public void onExpandEnd(View v, ExpandableListItem viewObject) {
+
+        }
+
+        @Override
+        public void onCollapseStart(View v, ExpandableListItem viewObject) {
+
+        }
+
+        @Override
+        public void onCollapseEnd(View v, ExpandableListItem viewObject) {
+            TitleViewHolder holder = (TitleViewHolder) v.getTag();
+            holder.expandableLayout.setVisibility(View.GONE);
+        }
+
+        @Override
+        public Collection<Animator> addExpandAnimations(View v, ExpandableListItem viewObject) {
+            return null;
+        }
+
+        @Override
+        public Collection<Animator> addCollapseAnimations(View v, ExpandableListItem viewObject) {
+            return null;
         }
 
         private static class TitleViewHolder {
             ViewGroup summaryLayout;
             TextView person;
             TextView amount;
-            ExpandableLayout expandableLayout;
+            LinearLayout expandableLayout;
         }
     }
 }

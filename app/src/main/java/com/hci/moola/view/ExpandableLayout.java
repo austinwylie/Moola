@@ -14,7 +14,6 @@ public class ExpandableLayout extends LinearLayout {
     private Animation openAnim, closeAnim;
     private int duration;
     private boolean isExpanded;
-    private int maxHeight;
 
     public ExpandableLayout(Context context) {
         this(context, null, 0);
@@ -36,8 +35,6 @@ public class ExpandableLayout extends LinearLayout {
             setVisibility(GONE);
 
         isExpanded = false;
-        maxHeight = 0;
-
     }
 
     public void setAnimationDuration(int duration) {
@@ -46,7 +43,8 @@ public class ExpandableLayout extends LinearLayout {
 
     public void expand() {
         if (!isExpanded) {
-            measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            int minHeight = getMinimumHeight();
+            measure(LayoutParams.MATCH_PARENT, minHeight);
             getLayoutParams().height = 0;
 
             openAnim = buildExpandAnimation(getMeasuredHeight());
@@ -58,11 +56,10 @@ public class ExpandableLayout extends LinearLayout {
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        maxHeight = Math.max(getMeasuredHeight(), maxHeight);
-    }
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+//    }
 
     private Animation buildExpandAnimation(final int targetHeight) {
         return new Animation() {

@@ -13,10 +13,11 @@ import com.hci.moola.model.Transaction;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class IouListActivity extends Activity {
+public class IouListActivity extends Activity implements IouListFragment.IouListFragmentCallback {
     private ArrayList<Iou> mIous;
 
     private static final int REQUEST_ADD_TRANSACTION = 1;
+    private static final int REQUEST_EDIT_TRANSACTION = 2;
     private static final String TAG_IOU_LIST = "IouListFragment";
 
     @Override
@@ -25,7 +26,9 @@ public class IouListActivity extends Activity {
         setContentView(R.layout.activity_iou_list);
         if (savedInstanceState == null) {
             mIous = new ArrayList<Iou>();
-            mIous.add(new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance())));
+            Iou a = new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance()));
+            a.addTransaction(new Transaction("Ben", true, 15, "lunch2", Calendar.getInstance()));
+            mIous.add(a);
             mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance())));
             mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance())));
 
@@ -63,5 +66,10 @@ public class IouListActivity extends Activity {
                 f.addTransaction(createdTransaction);
                 break;
         }
+    }
+
+    @Override
+    public void onTransactionClicked(Iou iou, Transaction txn) {
+
     }
 }

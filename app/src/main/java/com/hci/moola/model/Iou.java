@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Iou implements Parcelable {
+public class Iou implements Parcelable, Comparable<Iou> {
     private List<Transaction> transactionList = new ArrayList<Transaction>();
 
     public Iou(Transaction trans) {
@@ -19,6 +19,10 @@ public class Iou implements Parcelable {
 
     public String getPerson() {
         return transactionList.get(0).getPerson();
+    }
+
+    public void removeTransaction(Transaction txn) {
+        transactionList.remove(txn);
     }
 
     public String getTotalAmountText() {
@@ -44,6 +48,11 @@ public class Iou implements Parcelable {
 
     public List<Transaction> getTransactionList() {
         return transactionList;
+    }
+
+    @Override
+    public int compareTo(Iou another) {
+        return another.transactionList.get(0).compareTo(transactionList.get(0));
     }
 
     public Iou(Parcel in) {

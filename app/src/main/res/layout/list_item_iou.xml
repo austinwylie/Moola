@@ -29,10 +29,12 @@
             android:layout_centerVertical="true"/>
     </RelativeLayout>
     
-    <com.hci.moola.view.ExpandableLayout
+    <LinearLayout
         android:layout_below="@id/list_item_iou_summary_layout"
         android:id="@+id/list_item_iou_expandablelayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"/>
 
 </RelativeLayout>
