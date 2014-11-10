@@ -1,33 +1,39 @@
 package com.hci.moola.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Iou {
-    private String title;
-    private boolean owesMe;
-    private BigDecimal amount;
-    private String description;
+    private String person;
+    private double totalAmount;
+    private List<Transaction> transactionList;
 
-    public Iou(String title, boolean owesMe, BigDecimal amount, String description) {
-        this.title = title;
-        this.owesMe = owesMe;
-        this.amount = amount;
-        this.description = description;
+    public Iou(String person, List<Transaction> transactionList) {
+        this.person = person;
+        this.transactionList = transactionList;
+
+        totalAmount = 0;
+        for (Transaction txn : transactionList) {
+           totalAmount += txn.getAmount();
+        }
     }
 
-    public String getTitle() {
-        return title;
+    public Iou(String person, double amount) {
+        this.person = person;
+        this.totalAmount = amount;
+
     }
 
-    public boolean isOwesMe() {
-        return owesMe;
+
+    public String getPerson() {
+        return person;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public double getTotalAmount() {
+        return totalAmount;
     }
 
-    public String getDescription() {
-        return description;
+    public List<Transaction> getTransactionList() {
+        return transactionList;
     }
 }
