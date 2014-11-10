@@ -1,19 +1,16 @@
 package com.hci.moola;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
+import com.hci.moola.model.PostOffice;
+import com.hci.moola.model.Transaction;
 
-public class IouListActivity extends Activity implements IouListFragment.OnFragmentInteractionListener{
+public class IouListActivity extends Activity {
+    private static final int REQUEST_ADD_TRANSACTION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +23,6 @@ public class IouListActivity extends Activity implements IouListFragment.OnFragm
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -37,18 +33,22 @@ public class IouListActivity extends Activity implements IouListFragment.OnFragm
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_add) {
             Intent intent = new Intent(this, EditIouActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_ADD_TRANSACTION);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(String id) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
 
+        switch(requestCode) {
+            case REQUEST_ADD_TRANSACTION:
+                Transaction createdTransaction = (Transaction) PostOffice.getMessage(this.getClass());
+                break;
+        }
     }
 }

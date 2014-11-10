@@ -1,36 +1,26 @@
 package com.hci.moola.model;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Iou {
-    private String person;
-    private double totalAmount;
     private List<Transaction> transactionList;
 
-    public Iou(String person, List<Transaction> transactionList) {
-        this.person = person;
-        this.transactionList = transactionList;
-
-        totalAmount = 0;
-        for (Transaction txn : transactionList) {
-           totalAmount += txn.getAmount();
-        }
+    public Iou(Transaction trans) {
+        transactionList = new ArrayList<Transaction>();
+        transactionList.add(trans);
     }
 
-    public Iou(String person, double amount) {
-        this.person = person;
-        this.totalAmount = amount;
-
+    public void addTransaction(Transaction trans) {
+        transactionList.add(trans);
     }
-
 
     public String getPerson() {
-        return person;
+        return transactionList.get(0).getPerson();
     }
 
     public double getTotalAmount() {
-        return totalAmount;
+        return 0;
     }
 
     public List<Transaction> getTransactionList() {

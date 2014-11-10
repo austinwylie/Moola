@@ -2,38 +2,32 @@ package com.hci.moola.model;
 
 
 public class Transaction {
+    private String person;
     private boolean owesMe;
     private double amount;
     private String description;
 
-    public boolean isOwesMe() {
-        return owesMe;
+    public Transaction(String person, boolean owesMe, double amount, String description) {
+        this.person = person;
+        this.owesMe = owesMe;
+        this.amount = amount;
+        this.description = description;
     }
 
-    public void setOwesMe(boolean owesMe) {
-        this.owesMe = owesMe;
+    public String getPerson() {
+        return person;
+    }
+
+    public boolean isOwesMe() {
+        return owesMe;
     }
 
     public double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Transaction(boolean owesMe, double amount, String description) {
-        this.owesMe = owesMe;
-        this.amount = amount;
-        this.description = description;
-
-    }
 }
