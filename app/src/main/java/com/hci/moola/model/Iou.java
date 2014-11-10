@@ -22,7 +22,14 @@ public class Iou implements Parcelable {
     }
 
     public String getTotalAmountText() {
-        return CurrencyFormatter.getInstance().format(getTotalAmount());
+        double amount = getTotalAmount();
+        if (amount != 0)
+            return CurrencyFormatter.getInstance().format(amount);
+        for (Transaction txn : transactionList) {
+            if (txn.getDescription() != null && !txn.getDescription().isEmpty())
+                return txn.getDescription();
+        }
+        return "";
     }
 
     private double getTotalAmount() {

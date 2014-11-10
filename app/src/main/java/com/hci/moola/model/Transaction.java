@@ -6,7 +6,6 @@ import android.os.Parcelable;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class Transaction implements Parcelable {
@@ -16,12 +15,23 @@ public class Transaction implements Parcelable {
     private String description;
     private Calendar date;
 
+    public static final int ERROR_NO_PERSON = -1;
+    public static final int ERROR_NO_DESCRIPTION = -2;
+
     public Transaction(String person, boolean owesMe, double amount, String description, Calendar date) {
         this.person = person;
         this.owesMe = owesMe;
         this.amount = amount;
         this.description = description;
         this.date = date;
+    }
+
+    public int isValid() {
+        if (person == null || person.isEmpty())
+            return ERROR_NO_PERSON;
+        if (amount == 0 && (description == null || description.isEmpty()))
+            return ERROR_NO_DESCRIPTION;
+        return 0;
     }
 
     public double getFormattedAmount() {

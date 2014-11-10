@@ -6,19 +6,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.hci.moola.model.Iou;
 import com.hci.moola.model.Transaction;
+import com.hci.moola.view.ExpandableLayout;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
-import com.nhaarman.listviewanimations.itemmanipulation.expandablelistitem.ExpandableListItemAdapter;
-import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class IouListFragment extends Fragment {
     private List<Iou> mIous;
@@ -36,6 +36,8 @@ public class IouListFragment extends Fragment {
     }
 
     public void addTransaction(Transaction txn) {
+        mAdapter.collapseExpanded();
+
         for (Iou iou : mIous) {
             if (txn.belongsToIou(iou)) {
                 iou.addTransaction(txn);
@@ -51,8 +53,9 @@ public class IouListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        mIous = args.getParcelableArrayList(TAG_ARGS);
+        if (savedInstanceState == null) {
+            mIous = getArguments().getParcelableArrayList(TAG_ARGS);
+        }
     }
 
     @Override
@@ -69,8 +72,8 @@ public class IouListFragment extends Fragment {
                     @Override
                     public void onDismiss(final ViewGroup listView, final int[] reverseSortedPositions) {
                         for (int position : reverseSortedPositions) {
-                            mAdapter.collapse(position);
-                            mAdapter.remove(position);
+                            mIous.remove(position);
+                            mAdapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -79,90 +82,114 @@ public class IouListFragment extends Fragment {
         return rootView;
     }
 
-    private static class IouAdapter extends ExpandableListItemAdapter<Iou> {
-        private Activity mActivity;
-        private List<View> mRecycledViews;
+    private static class IouAdapter extends BaseAdapter {
+        private List<Iou> mItems;
+        private Locale mLocale;
+        private LayoutInflater mInflater;
+        private boolean[] mExpanded;
 
         public IouAdapter(Activity activity, List<Iou> items) {
-            super(activity, items);
-            mActivity = activity;
-            mRecycledViews = new ArrayList<View>();
+            mItems = items;
+            mInflater = activity.getLayoutInflater();
+            mLocale = activity.getResources().getConfiguration().locale;
+            mExpanded = new boolean[items.size()];
+        }
+
+        public void collapseExpanded() {
+            Arrays.fill(mExpanded, false);
+        }
+
+        private boolean isExpanded(int index) {
+            return mExpanded[index];
         }
 
         @Override
-        public View getTitleView(int position, View convertView, ViewGroup parent) {
-            TitleViewHolder holder;
+        public void notifyDataSetChanged() {
+            if (mExpanded.length < mItems.size()) {
+                mExpanded = new boolean[mItems.size() + 4];
+            }
+            super.notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Object getItem(int pos) {
+            return mItems.get(pos);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final TitleViewHolder holder;
 
             if (convertView == null) {
-                convertView = mActivity.getLayoutInflater().inflate(R.layout.list_item_iou, parent, false);
+                convertView = mInflater.inflate(R.layout.list_item_iou, parent, false);
 
                 holder = new TitleViewHolder();
                 holder.person = (TextView) convertView.findViewById(R.id.list_item_iou_person);
                 holder.amount = (TextView) convertView.findViewById(R.id.list_item_iou_amount);
+                holder.expandableLayout = (ExpandableLayout) convertView.findViewById(R.id.list_item_iou_expandablelayout);
+                holder.summaryLayout = (ViewGroup) convertView.findViewById(R.id.list_item_iou_summary_layout);
                 convertView.setTag(holder);
             } else
                 holder = (TitleViewHolder) convertView.getTag();
 
-            Iou item = getItem(position);
-            holder.person.setText(item.getPerson());
-            holder.amount.setText(item.getTotalAmountText());
+            holder.summaryLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isExpanded(position)) {
+                        holder.expandableLayout.collapse();
+                    } else {
+                        holder.expandableLayout.expand();
+                    }
+                    mExpanded[position] = !mExpanded[position];
+                }
+            });
+
+            Iou item = (Iou) getItem(position);
+            if (item != null) {
+                holder.person.setText(item.getPerson());
+                holder.amount.setText(item.getTotalAmountText());
+
+                List<Transaction> txns = item.getTransactionList();
+                for (int i = 0; i < txns.size(); i++) {
+                    View tRow;
+
+                    if (holder.expandableLayout.getChildCount() <= i) {
+                        tRow = mInflater.inflate(R.layout.list_item_iou_expanded, null);
+                        holder.expandableLayout.addView(tRow);
+                    } else
+                        tRow = holder.expandableLayout.getChildAt(i);
+
+                    TextView description = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_description);
+                    TextView date = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_date);
+                    Transaction t = txns.get(i);
+                    description.setText(t.getFormattedDescription());
+                    date.setText(t.getDate(mLocale));
+                }
+
+                while (holder.expandableLayout.getChildCount() > txns.size())
+                    holder.expandableLayout.removeViewAt(holder.expandableLayout.getChildCount() - 1);
+
+                holder.expandableLayout.setVisibility(isExpanded(position) ? View.VISIBLE : View.GONE);
+            }
 
             return convertView;
         }
 
         private static class TitleViewHolder {
+            ViewGroup summaryLayout;
             TextView person;
             TextView amount;
-        }
-
-        @Override
-        public View getContentView(int position, View convertView, ViewGroup parent) {
-            LinearLayout layoutView = (LinearLayout) convertView;
-
-            if (layoutView == null) {
-                layoutView = new LinearLayout(mActivity);
-                ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutView.setLayoutParams(params);
-            }
-
-            List<Transaction> transactions = getItem(position).getTransactionList();
-            while (layoutView.getChildCount() > transactions.size()) {
-                int index = layoutView.getChildCount() - 1;
-                mRecycledViews.add(layoutView.getChildAt(index));
-                layoutView.removeViewAt(index);
-            }
-
-            while (layoutView.getChildCount() < transactions.size()) {
-                View tRow = null;
-                if (!mRecycledViews.isEmpty())
-                    tRow = mRecycledViews.remove(mRecycledViews.size() - 1);
-
-                if (tRow == null) {
-                    tRow = mActivity.getLayoutInflater().inflate(R.layout.list_item_iou_expanded, layoutView, false);
-                    ContentViewHolder holder = new ContentViewHolder();
-                    holder.description = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_description);
-                    holder.date = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_date);
-                    tRow.setTag(holder);
-                }
-
-                layoutView.addView(tRow);
-            }
-
-            for (int i = 0; i < layoutView.getChildCount(); i++) {
-                View tRow = layoutView.getChildAt(i);
-                ContentViewHolder holder = (ContentViewHolder) tRow.getTag();
-                Transaction txn = transactions.get(i);
-                holder.description.setText(txn.getFormattedDescription());
-                holder.date.setText(txn.getDate(mActivity.getResources().getConfiguration().locale));
-            }
-
-            return layoutView;
-        }
-
-        private static class ContentViewHolder {
-            TextView description;
-            TextView date;
+            ExpandableLayout expandableLayout;
         }
     }
 }

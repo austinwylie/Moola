@@ -3,8 +3,6 @@ package com.hci.moola;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.hci.moola.model.PostOffice;
 import com.hci.moola.model.Transaction;
@@ -31,13 +30,12 @@ public class EditIouActivity extends Activity {
 
         if (savedInstanceState == null) {
             Transaction model = (Transaction) PostOffice.getMessage(this.getClass());
-            EditIouFragment f = new EditIouFragment(model); // can be null
+            EditIouFragment f = EditIouFragment.newInstance(model); // can be null
             getFragmentManager().beginTransaction()
                     .add(R.id.container, f, f.getClass().getName())
                     .commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,9 +49,21 @@ public class EditIouActivity extends Activity {
 
         if (id == R.id.action_save) {
             EditIouFragment f = (EditIouFragment) getFragmentManager().findFragmentByTag(EditIouFragment.class.getName());
-            PostOffice.putMessage(IouListActivity.class, f.getModel());
-            setResult(Activity.RESULT_OK);
-            finish();
+            Transaction t = f.getModel();
+            int result = t.isValid();
+            switch (result) {
+                case 0:
+                    PostOffice.putMessage(IouListActivity.class, f.getModel());
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                    break;
+                case Transaction.ERROR_NO_PERSON:
+                    Toast.makeText(this, "You must enter a name.", Toast.LENGTH_LONG).show();
+                    break;
+                case Transaction.ERROR_NO_DESCRIPTION:
+                    Toast.makeText(this, "You must enter an amount or description.", Toast.LENGTH_LONG).show();
+                    break;
+            }
             return true;
         } else if (id == android.R.id.home) {
             setResult(Activity.RESULT_CANCELED);
@@ -74,8 +84,22 @@ public class EditIouActivity extends Activity {
         private EditText mAmountEditText;
         private EditText mDescriptionEditText;
 
-        public EditIouFragment(Transaction model) {
-            mModel = model;
+        private static final String KEY_ARG = "Transaction";
+
+        public static EditIouFragment newInstance(Transaction model) {
+            EditIouFragment f = new EditIouFragment();
+            Bundle args = new Bundle();
+            args.putParcelable(KEY_ARG, model);
+            f.setArguments(args);
+            return f;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            if (savedInstanceState == null) {
+                mModel = getArguments().getParcelable(KEY_ARG);
+            }
         }
 
         public Transaction getModel() {
