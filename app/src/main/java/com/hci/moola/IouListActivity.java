@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hci.moola.model.ColorPicker;
 import com.hci.moola.model.DataCollector;
 import com.hci.moola.model.Iou;
 import com.hci.moola.model.PostOffice;
@@ -30,11 +31,12 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
         setContentView(R.layout.activity_iou_list);
         if (savedInstanceState == null) {
             mIous = new ArrayList<Iou>();
-            Iou a = new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance()));
+            ColorPicker cp = ColorPicker.getInstance();
+            Iou a = new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance()), cp.next());
             a.addTransaction(new Transaction("Ben", true, 15, "lunch2", Calendar.getInstance()));
             mIous.add(a);
-            mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance())));
-            mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance())));
+            mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance()), cp.next()));
+            mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance()), cp.next()));
 
             IouListFragment f = IouListFragment.newInstance(mIous);
             getFragmentManager().beginTransaction().add(R.id.container, f, TAG_IOU_LIST).commit();

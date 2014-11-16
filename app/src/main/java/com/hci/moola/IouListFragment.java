@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hci.moola.model.ColorPicker;
 import com.hci.moola.model.Iou;
 import com.hci.moola.model.ObservableSortedList;
 import com.hci.moola.model.Transaction;
@@ -47,7 +48,7 @@ public class IouListFragment extends Fragment {
                 return;
             }
         }
-        mIous.add(new Iou(txn));
+        mIous.add(new Iou(txn, ColorPicker.getInstance().next()));
         mAdapter.notifyDataSetChanged();
     }
 
@@ -103,6 +104,11 @@ public class IouListFragment extends Fragment {
         private NaturalListView mListView;
         private IouListFragmentCallback mFragmentCallback;
 
+        private static final int TEXT_DARK_COLOR = 0xff333333;
+        private static final int TEXT_LIGHT_COLOR = 0xfff0f0f0;
+        private static final int TEXT_DARK_SEC_COLOR = 0xff666666;
+        private static final int TEXT_LIGHT_SEC_COLOR = 0xffe0e0e0;
+
         public IouAdapter(Activity activity, ObservableSortedList<Iou> items, NaturalListView listView, IouListFragmentCallback callback) {
             super(activity, items);
             mInflater = activity.getLayoutInflater();
@@ -155,8 +161,11 @@ public class IouListFragment extends Fragment {
             final ExpandableListItem<Iou> expandedItem = (ExpandableListItem<Iou>) getItem(position);
             final Iou item = expandedItem.getItem();
             if (item != null) {
+                int textColor = ColorPicker.isDarkColor(item.getColor()) ? TEXT_LIGHT_COLOR : TEXT_DARK_COLOR;
                 holder.person.setText(item.getPerson());
+                holder.person.setTextColor(textColor);
                 holder.amount.setText(item.getTotalAmountText());
+                holder.amount.setTextColor(textColor);
 
                 List<Transaction> txns = item.getTransactionList();
                 for (int i = 0; i < txns.size(); i++) {
@@ -167,6 +176,8 @@ public class IouListFragment extends Fragment {
                         holder.expandableLayout.addView(tRow);
                     } else
                         tRow = holder.expandableLayout.getChildAt(i);
+
+                    tRow.setBackgroundColor((item.getColor() & 0x00FFFFFF) ^ 0xa0000000);
 
                     final Transaction t = txns.get(i);
                     tRow.setOnTouchListener(new SwipeDismissTouchListener(tRow, null, new SwipeDismissTouchListener.DismissCallbacks() {
@@ -192,7 +203,9 @@ public class IouListFragment extends Fragment {
                     }));
 
                     TextView description = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_description);
+                    description.setTextColor(textColor);
                     TextView date = (TextView) tRow.findViewById(R.id.list_item_iou_expanded_date);
+                    date.setTextColor(ColorPicker.isDarkColor(item.getColor()) ? TEXT_LIGHT_SEC_COLOR : TEXT_DARK_SEC_COLOR);
                     description.setText(t.getFormattedDescription());
                     date.setText(t.getDate(mLocale));
                 }
@@ -202,6 +215,8 @@ public class IouListFragment extends Fragment {
 
                 if (!expandedItem.isExpanded())
                     holder.expandableLayout.setVisibility(View.GONE);
+
+                convertView.setBackgroundColor(item.getColor());
             }
 
             return convertView;

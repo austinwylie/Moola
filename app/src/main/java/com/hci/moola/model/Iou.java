@@ -8,9 +8,11 @@ import java.util.List;
 
 public class Iou implements Parcelable, Comparable<Iou> {
     private List<Transaction> transactionList = new ArrayList<Transaction>();
+    private int color;
 
-    public Iou(Transaction trans) {
+    public Iou(Transaction trans, int color) {
         transactionList.add(trans);
+        this.color = color;
     }
 
     public void addTransaction(Transaction trans) {
@@ -25,6 +27,10 @@ public class Iou implements Parcelable, Comparable<Iou> {
                 break;
             }
         }
+    }
+
+    public int getColor() {
+        return color;
     }
 
     public String getPerson() {
@@ -65,7 +71,7 @@ public class Iou implements Parcelable, Comparable<Iou> {
     @Override
     public int compareTo(Iou another) {
         if (!another.transactionList.isEmpty() && !transactionList.isEmpty())
-            return another.transactionList.get(0).compareTo(transactionList.get(0));
+            return transactionList.get(0).compareTo(another.transactionList.get(0));
         return -1;
     }
 

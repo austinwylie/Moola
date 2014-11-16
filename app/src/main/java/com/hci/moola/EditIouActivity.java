@@ -56,7 +56,7 @@ public class EditIouActivity extends Activity {
             int result = t.isValid();
             switch (result) {
                 case 0:
-                    PostOffice.putMessage(IouListActivity.class, f.getModel());
+                    PostOffice.putMessage(IouListActivity.class, t);
                     setResult(Activity.RESULT_OK);
                     finish();
                     break;
