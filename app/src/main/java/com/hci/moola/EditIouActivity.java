@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.hci.moola.model.DataCollector;
 import com.hci.moola.model.PostOffice;
 import com.hci.moola.model.Transaction;
 
@@ -35,6 +36,8 @@ public class EditIouActivity extends Activity {
                     .add(R.id.container, f, f.getClass().getName())
                     .commit();
         }
+
+        DataCollector.getInstance().attachTouchCounterToActivity(this);
     }
 
     @Override

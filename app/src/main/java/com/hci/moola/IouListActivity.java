@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 
+import com.hci.moola.model.DataCollector;
 import com.hci.moola.model.Iou;
 import com.hci.moola.model.PostOffice;
 import com.hci.moola.model.Transaction;
@@ -34,7 +38,15 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
 
             IouListFragment f = IouListFragment.newInstance(mIous);
             getFragmentManager().beginTransaction().add(R.id.container, f, TAG_IOU_LIST).commit();
+
+            DataCollector.getInstance().attachTouchCounterToActivity(this);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        DataCollector.getInstance().exportToLogFile();
     }
 
     @Override

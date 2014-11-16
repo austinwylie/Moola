@@ -28,7 +28,9 @@ public class Iou implements Parcelable, Comparable<Iou> {
     }
 
     public String getPerson() {
-        return transactionList.get(0).getPerson();
+        if (!transactionList.isEmpty())
+            return transactionList.get(0).getPerson();
+        return "";
     }
 
     public void removeTransaction(Transaction txn) {
@@ -62,7 +64,9 @@ public class Iou implements Parcelable, Comparable<Iou> {
 
     @Override
     public int compareTo(Iou another) {
-        return another.transactionList.get(0).compareTo(transactionList.get(0));
+        if (!another.transactionList.isEmpty() && !transactionList.isEmpty())
+            return another.transactionList.get(0).compareTo(transactionList.get(0));
+        return -1;
     }
 
     public Iou(Parcel in) {

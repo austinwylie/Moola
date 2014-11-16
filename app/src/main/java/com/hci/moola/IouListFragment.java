@@ -177,11 +177,11 @@ public class IouListFragment extends Fragment {
 
                         @Override
                         public void onDismiss(View view, Object token) {
-                            item.removeTransaction(t);
-                            if (item.getTransactionList().isEmpty()) {
-                                IouAdapter.this.mItems.remove(position);
+                            if (item.getTransactionList().size() <= 1) {
+                                IouAdapter.this.remove((ExpandableListItem<Iou>) IouAdapter.this.getItem(position));
 //                                IouAdapter.this.collapseAllItems();
                             }
+                            item.removeTransaction(t);
                             IouAdapter.this.notifyDataSetChanged();
                         }
 
