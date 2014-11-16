@@ -27,7 +27,7 @@ public class EditIouActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_iou);
-        getActionBar().setTitle("Add Iou");
+        getActionBar().setTitle("Add IOU");
 
         if (savedInstanceState == null) {
             Transaction model = (Transaction) PostOffice.getMessage(this.getClass());

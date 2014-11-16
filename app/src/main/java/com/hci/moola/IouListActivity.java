@@ -46,12 +46,6 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        DataCollector.getInstance().exportToLogFile();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_iou_list, menu);

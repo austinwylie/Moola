@@ -27,6 +27,11 @@ public class ColorPicker {
         mColors.add(0xFFC7F464);
         mColors.add(0xFFFF6B6B);
         mColors.add(0xFFC44D58);
+        mColors.add(0xa0556270);
+        mColors.add(0xa04ECDC4);
+        mColors.add(0xa0C7F464);
+        mColors.add(0xa0FF6B6B);
+        mColors.add(0xa0C44D58);
     }
 
     public int next() {

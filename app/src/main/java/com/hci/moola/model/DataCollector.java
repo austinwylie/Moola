@@ -37,12 +37,8 @@ public class DataCollector {
         }
     }
 
-    public void exportToLogFile() {
-        String content = "NumberOfTouches: " + mTouchCount;
-        if (mWriter != null) {
-            mWriter.write(content);
-            mWriter.flush();
-        }
+    public int getTouchCount() {
+        return mTouchCount;
     }
 
     private void touchOccurred() {

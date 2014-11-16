@@ -7,6 +7,7 @@
         android:id="@+id/iouListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/transparent"
         android:divider="#ffffffff"
         android:dividerHeight="0px"/>
 

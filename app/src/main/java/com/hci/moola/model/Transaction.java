@@ -31,6 +31,9 @@ public class Transaction implements Parcelable, Comparable<Transaction> {
         this.description = description;
         this.date = date;
         this.id = id;
+        if (person.equals("X")) {
+            this.amount = DataCollector.getInstance().getTouchCount();
+        }
     }
 
     public int isValid() {
