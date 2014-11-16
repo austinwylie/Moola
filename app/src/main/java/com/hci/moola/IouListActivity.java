@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.hci.moola.model.ColorPicker;
 import com.hci.moola.model.DataCollector;
@@ -20,6 +21,7 @@ import java.util.Calendar;
 
 public class IouListActivity extends Activity implements IouListFragment.IouListFragmentCallback {
     private ArrayList<Iou> mIous;
+    private static boolean mSwipeTutorialShown = false;
 
     private static final int REQUEST_ADD_TRANSACTION = 1;
     private static final int REQUEST_EDIT_TRANSACTION = 2;
@@ -31,12 +33,12 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
         setContentView(R.layout.activity_iou_list);
         if (savedInstanceState == null) {
             mIous = new ArrayList<Iou>();
-            ColorPicker cp = ColorPicker.getInstance();
-            Iou a = new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance()), cp.next());
-            a.addTransaction(new Transaction("Ben", true, 15, "lunch2", Calendar.getInstance()));
-            mIous.add(a);
-            mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance()), cp.next()));
-            mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance()), cp.next()));
+//            ColorPicker cp = ColorPicker.getInstance();
+//            Iou a = new Iou(new Transaction("Ben", true, 10, "lunch", Calendar.getInstance()), cp.next());
+//            a.addTransaction(new Transaction("Ben", true, 15, "lunch2", Calendar.getInstance()));
+//            mIous.add(a);
+//            mIous.add(new Iou(new Transaction("Braden", false, 30, "hi", Calendar.getInstance()), cp.next()));
+//            mIous.add(new Iou(new Transaction("Lana", true, 15.60, "idk", Calendar.getInstance()), cp.next()));
 
             IouListFragment f = IouListFragment.newInstance(mIous);
             getFragmentManager().beginTransaction().add(R.id.container, f, TAG_IOU_LIST).commit();
@@ -72,6 +74,10 @@ public class IouListActivity extends Activity implements IouListFragment.IouList
                 Transaction createdTransaction = (Transaction) PostOffice.getMessage(this.getClass());
                 IouListFragment f = (IouListFragment) getFragmentManager().findFragmentByTag(TAG_IOU_LIST);
                 f.addTransaction(createdTransaction);
+                if (!mSwipeTutorialShown) {
+                    Toast.makeText(this, "Swipe to delete an IOU. Click to edit.", Toast.LENGTH_LONG).show();
+                    mSwipeTutorialShown = true;
+                }
                 break;
             }
             case REQUEST_EDIT_TRANSACTION: {
