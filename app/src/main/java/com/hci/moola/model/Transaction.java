@@ -25,7 +25,7 @@ public class Transaction implements Parcelable, Comparable<Transaction> {
     }
 
     public Transaction(String person, boolean owesMe, double amount, String description, Calendar date, int id) {
-        this.person = person;
+        this.person = person.trim();
         this.owesMe = owesMe;
         this.amount = amount;
         this.description = description;
